@@ -146,48 +146,7 @@ tab_main, tab_pred, tab_breach, tab_geo = st.tabs(
 # TAB 1 — OVERVIEW
 # =========================
 with tab_main:
-    # -------------------------
-    # Top Metrics
-    # -------------------------
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        total_rides = len(df_f)
-        st.markdown(f"""
-        <div class="metric-card">
-            <p style="font-size: 20px; color: #EAF6F9; text-align: center">Total Rides</p>
-            <h2 style="font-size: 40px; margin-top: 5px; color: #fff; text-align: center">{total_rides:,}</h2>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with col2:
-        delay_rate = df_f['delay'].mean() * 100
-        st.markdown(f"""
-        <div class="metric-card">
-            <p style="font-size: 20px; color: #EAF6F9; text-align: center">Delay Rate</p>
-            <h2 style="font-size: 40px; margin-top: 5px; color: #fff; text-align: center">{delay_rate:.1f}%</h2>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with col3:
-        avg_distance = df_f['Distance'].mean()
-        st.markdown(f"""
-        <div class="metric-card">
-            <p style="font-size: 20px; color: #EAF6F9; text-align: center">Avg Distance per Ride</p>
-            <h2 style="font-size: 40px; margin-top: 5px; color: #fff; text-align: center">{avg_distance:.1f} mi</h2>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with col4:
-        busiest_hour = df_f['Pickup_Hour'].value_counts().idxmax()
-        st.markdown(f"""
-        <div class="metric-card">
-            <p style="font-size: 20px; color: #EAF6F9; text-align: center">Busiest Pickup Hour</p>
-            <h2 style="font-size: 40px; margin-top: 5px; color: #fff; text-align: center">{busiest_hour}:00</h2>
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
+   
     # -------------------------
     # Executive insights
     # -------------------------
@@ -203,6 +162,7 @@ with tab_main:
     total_delays = df_f['delay'].sum()
     avg_dist_delay = df_f[df_f['delay'] == 1]['Distance'].mean()
     avg_dist_all = df_f['Distance'].mean()
+    busiest_hour = df_f['Pickup_Hour'].value_counts().idxmax()
 
     insights = [
         f"📌 Delay on weekdays is <b>{(wk_delay - we_delay)*100:.1f}%</b> higher than weekends.",
@@ -221,6 +181,7 @@ with tab_main:
             st.markdown(f'<div class="insight-box">{insight}</div>', unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown('<div style="margin-top:20px;">', unsafe_allow_html=True)
 
     # -------------------------
     # Charts in 3 columns
@@ -232,16 +193,6 @@ with tab_main:
     delay_percent = df_f['delay_label'].value_counts(normalize=True) * 100
     with col1_chart:
         with st.container():
-            st.markdown(
-                """
-                <div style="
-                    background-color:#ffffff;
-                    padding:15px;
-                    border-radius:15px;
-                    box-shadow:0 6px 15px rgba(0,0,0,0.1);
-                ">
-                """, unsafe_allow_html=True
-            )
     
             fig_doughnut = go.Figure(data=[go.Pie(
                 labels=delay_counts.index,
@@ -250,7 +201,7 @@ with tab_main:
                 hoverinfo="label+percent+value",
                 text=[f"{val} ({percent:.1f}%)" for val, percent in zip(delay_counts.values, delay_percent)],
                 textinfo="text",
-                marker_colors=["#28A745", "#DC3545"]
+                marker_colors=["#DC3545","#28A745"]
             )])
             fig_doughnut.update_layout(
                 title_text="🚖 Delays vs No Delays (Overall)",
@@ -260,8 +211,6 @@ with tab_main:
                 margin=dict(l=10, r=10, t=40, b=10)
             )
             st.plotly_chart(fig_doughnut, use_container_width=True)
-    
-            st.markdown("</div>", unsafe_allow_html=True)
     
     
     # 2️⃣ Bar Chart — % of Delays by Service Area
@@ -273,17 +222,6 @@ with tab_main:
     
     with col2_chart:
         with st.container():
-            st.markdown(
-                """
-                <div style="
-                    background-color:#ffffff;
-                    padding:15px;
-                    border-radius:15px;
-                    box-shadow:0 6px 15px rgba(0,0,0,0.1);
-                ">
-                """, unsafe_allow_html=True
-            )
-    
             fig_service_area = px.bar(
                 service_area_counts,
                 x='ServiceArea',
@@ -306,7 +244,7 @@ with tab_main:
             )
             st.plotly_chart(fig_service_area, use_container_width=True)
     
-            st.markdown("</div>", unsafe_allow_html=True)
+
     
     
     # 3️⃣ Column Chart — Top 20 Pickup Cities
@@ -320,16 +258,6 @@ with tab_main:
     
     with col3_chart:
         with st.container():
-            st.markdown(
-                """
-                <div style="
-                    background-color:#ffffff;
-                    padding:15px;
-                    border-radius:15px;
-                    box-shadow:0 6px 15px rgba(0,0,0,0.1);
-                ">
-                """, unsafe_allow_html=True
-            )
     
             fig_city = px.bar(
                 city_counts,
@@ -353,22 +281,11 @@ with tab_main:
             )
             st.plotly_chart(fig_city, use_container_width=True)
     
-            st.markdown("</div>", unsafe_allow_html=True)
-    
+
     
     # 4️⃣ Full-width — Delays by Hour
     st.markdown('<div style="margin-top:20px;">', unsafe_allow_html=True)  # Add spacing before full-width card
     with st.container():
-        st.markdown(
-            """
-            <div style="
-                background-color:#ffffff;
-                padding:15px;
-                border-radius:15px;
-                box-shadow:0 6px 15px rgba(0,0,0,0.1);
-            ">
-            """, unsafe_allow_html=True
-        )
     
         st.markdown("### ⏰ Delays by Hour of Day")
         df_hour = df_f.groupby(['Pickup_Hour', 'delay_label']).size().reset_index(name='count')
@@ -391,6 +308,7 @@ with tab_main:
             barmode='stack',
             color_discrete_map={"No Delay": "#28A745", "Delay": "#DC3545"},
             height=400,
+            width=800,
             animation_frame=None
         )
         fig_hour.update_traces(textposition='inside')  # Text inside bars
@@ -403,7 +321,6 @@ with tab_main:
             margin=dict(l=10, r=10, t=40, b=10)
         )
         st.plotly_chart(fig_hour, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
 
 
 
@@ -583,19 +500,18 @@ with tab_breach:
         delay_counts['percent'] = (delay_counts['count'] / total_trips * 100).round(1)
         delay_counts['label'] = delay_counts.apply(lambda x: f"{x['count']} ({x['percent']}%)", axis=1)
 
-        st.markdown('<div class="big-card">', unsafe_allow_html=True)
         fig1 = px.bar(
             delay_counts,
             x='PickupDelay_Flag',
             y='count',
             text='label',
             color='PickupDelay_Flag',
-            color_discrete_sequence=['#0069AC'],
+            color_discrete_sequence=["#DC3545","#28A745","#FF704D",'#0069AC'],
+            labels={'count': 'Number of Rides', 'PickupDelay_Flag': 'Delay Flags'},
             title="🚖 Pickup Delay Flags (%)"
         )
-        fig1.update_traces(textposition='outside')
+        fig1.update_traces(textposition='auto')
         st.plotly_chart(fig1, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
 
 
     # ==========================
@@ -607,21 +523,20 @@ with tab_breach:
         ack_counts['percent'] = (ack_counts['count'] / total_trips * 100).round(1)
         ack_counts['label'] = ack_counts.apply(lambda x: f"{x['count']} ({x['percent']}%)", axis=1)
 
-        st.markdown('<div class="big-card">', unsafe_allow_html=True)
         fig2 = px.bar(
             ack_counts,
             x='ServiceAck_Flag',
             y='count',
             text='label',
             color='ServiceAck_Flag',
-            color_discrete_sequence=['#0069AC'],
+            color_discrete_sequence=["#28A745","#FF704D",'#0069AC',"#DC3545"],
+            labels={'count': 'Number of Rides', 'ServiceAck_Flag': 'Service Acknowledge Flags'},
             title="📝 Service Acknowledgement Issue (%)"
         )
-        fig2.update_traces(textposition='outside')
+        fig2.update_traces(textposition='auto')
         fig2.update_layout(xaxis_tickangle=45)
         st.plotly_chart(fig2, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-
+       
 
     # ==========================
     # 3. Alert Levels
@@ -632,59 +547,68 @@ with tab_breach:
         alert_counts['percent'] = (alert_counts['count'] / total_trips * 100).round(1)
         alert_counts['label'] = alert_counts.apply(lambda x: f"{x['count']} ({x['percent']}%)", axis=1)
 
-        st.markdown('<div class="big-card">', unsafe_allow_html=True)
+      
         fig3 = px.bar(
             alert_counts,
             x='AlertLevel',
             y='count',
             text='label',
             color='AlertLevel',
+            labels={'count': 'Number of Rides', 'AlertLevel': "Alert Level"},
             title="🚨 Alerts (%)",
-            color_discrete_sequence=["#31C035", "#EC2323", "#0069AC"]
+            color_discrete_sequence=["#DC3545", "#FF704D", "#28A745","#CC0000"]
         )
-        fig3.update_traces(textposition='outside')
+        fig3.update_traces(textposition='auto')
         fig3.update_layout(xaxis_tickangle=45)
         st.plotly_chart(fig3, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+       
 
 
     # ============================================
     # ROW 2 – HEATMAP + STACKED BAR
     # ============================================
-    d1, d2, d3 = st.columns([1,1,1])
-
-    # ==========================
-    # 4. Discrete Heatmap
-        # ==========================
+    d1, d2 = st.columns([1,1])
     with d1:
-        # 1. Extract time features
         kpi['Pickup_Hour'] = pd.to_datetime(kpi['Pickup DateTime']).dt.hour
         kpi['Weekday'] = pd.to_datetime(kpi['Pickup DateTime']).dt.day_name()
-    
-        # 2. Breach indicator
         kpi['IsRed'] = kpi['AlertLevel'].str.startswith("RED")
         heat = kpi.groupby(['Weekday', 'Pickup_Hour'])['IsRed'].mean().reset_index()
-        heat['Pct'] = heat['IsRed'] * 100
-
-
-        st.markdown('<div class="big-card">', unsafe_allow_html=True)
-        colors = ['#d4f4dd', '#a8e6a3', '#7cd66a', '#ffb366', '#ff704d']
-        fig4 = px.density_heatmap(
-        heat,
-        x='Pickup_Hour',
-        y='Weekday',
-        z='Pct',
-        color_continuous_scale=colors,
-        title="🔥 Heatmap: Red Alert Breach Rate by Hour & Weekday")
-        fig4.update_layout(
-        title="🔥 Heatmap: Red Alerts by Hour & Weekday",
-        xaxis_title="Pickup Hour",
-        yaxis_title="Day of Week (0=Mon)",
-        coloraxis_colorbar_title="% Red Alerts" )
-        st.plotly_chart(fig4, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-        st.markdown("<br>", unsafe_allow_html=True)
+        heat['Pct'] = (heat['IsRed'] * 100).round(1)
         
+        # Re-order weekdays
+        order = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
+        heat = heat.pivot(index="Weekday", columns="Pickup_Hour", values="Pct").reindex(order)
+        
+        # --------------------------
+        # Use imshow to allow cell text
+        # --------------------------
+        fig4 = px.imshow(
+            heat,
+            text_auto=True,   # <-- Show % inside each cell
+            aspect="auto",
+            color_continuous_scale=['#d4f4dd', '#a8e6a3', '#7cd66a', '#ffb366', '#ff704d'],
+            labels=dict(x="Pickup Hour", y="Day of Week", color="% Red Alerts"),
+            title="🔥 Heatmap: Red Alert % by Hour & Weekday"
+        )
+        
+        # Show discrete hourly ticks (00–23)
+        fig4.update_xaxes(
+            tickmode='array',
+            tickvals=list(range(24)),
+            ticktext=[f"{i:02d}:00" for i in range(24)]
+        )
+        
+        # Bold titles and improve layout
+        fig4.update_layout(
+            title_font=dict(size=20, color="black"),
+            xaxis_title="Pickup Hour",
+            yaxis_title="Day of Week",
+            coloraxis_colorbar=dict(title="% Red Alerts"),
+            margin=dict(l=40, r=40, t=80, b=40)
+        )
+        
+        st.plotly_chart(fig4, use_container_width=True)
+
         
     # ==========================
     # 5. Stacked Bar (Service Area)
@@ -694,29 +618,28 @@ with tab_breach:
         alert_area['percent'] = alert_area.groupby('ServiceAreaCode')['count'].transform(lambda x: x / x.sum() * 100)       
         alert_area['label'] = alert_area.apply(lambda x: f"{x['count']} ({x['percent']:.1f}%)", axis=1)
 
-        st.markdown('<div class="big-card">', unsafe_allow_html=True)
         fig5 = px.bar(
             alert_area,
             x='ServiceAreaCode',
             y='count',
             color='AlertLevel',
+            labels={'count': 'Number of Rides', 'ServiceAreaCode': "Service Area Code"},
             text='label',
             barmode='stack',
             title="📦 Alert Breakdown by Service Area (%)",
-            color_discrete_sequence=["#31C035", "#0069AC", "#EC2323"]
+            color_discrete_sequence=["#28A745","#DC3545","#FF704D","#DC3545"]
         )
         fig5.update_traces(textposition='inside')
         st.plotly_chart(fig5, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-
 
 
 # =========================
 # TAB 3 — GEO
 # =========================
 with tab_geo:
-    st.subheader("🗺 Pickup City Geo Map (Delay vs No Delay)")
+    st.subheader("🗺 Pickup City Performance Map (Delay Rate by City)")
 
+    # --- Coordinates ---
     city_coords = {
         "New York": (40.7128, -74.0060),
         "JFK": (40.6413, -73.7781),
@@ -729,22 +652,49 @@ with tab_geo:
     }
 
     def coord(city):
-        return city_coords.get(city, (40.71 + random.uniform(-0.3,0.3), -74 + random.uniform(-0.3,0.3)))
+        return city_coords.get(city, (None, None))
 
-    df_map = df_f.copy()
+    # Copy & generate unique TripID
+    df_map = df_f.copy().reset_index().rename(columns={"index": "TripID"})
+
     df_map["lat"] = df_map["PickupCity"].apply(lambda x: coord(x)[0])
     df_map["lon"] = df_map["PickupCity"].apply(lambda x: coord(x)[1])
 
+    # --- Aggregate by city ---
+    city_summary = df_map.groupby(["PickupCity", "lat", "lon"]).agg(
+        total_trips=("TripID", "count"),
+        delay_trips=("delay_label", lambda x: (x == "Delay").sum())
+    ).reset_index()
+
+    city_summary["delay_rate"] = (
+        city_summary["delay_trips"] / city_summary["total_trips"] * 100
+    ).round(1)
+
+    city_summary["size"] = city_summary["total_trips"] * 3  # bubble scaling
+
     fig = px.scatter_mapbox(
-        df_map,
+        city_summary,
         lat="lat",
         lon="lon",
-        color="delay_label",
+        size="size",
+        color="delay_rate",
         hover_name="PickupCity",
+        hover_data={
+            "total_trips": True,
+            "delay_trips": True,
+            "delay_rate": True,
+            "lat": False,
+            "lon": False
+        },
+        color_continuous_scale=["#28A745", "#FFC107", "#DC3545"],
         zoom=4,
-        height=600,
-        color_discrete_map={"No Delay": "#28A745", "Delay": "#DC3545"},
+        height=600
     )
 
-    fig.update_layout(mapbox_style="open-street-map")
+    fig.update_layout(
+        mapbox_style="open-street-map",
+        coloraxis_colorbar=dict(title="% Delay Rate"),
+        margin=dict(l=20, r=20, t=40, b=20),
+    )
+
     st.plotly_chart(fig, use_container_width=True)
