@@ -165,15 +165,31 @@ with tab_main:
     busiest_hour = df_f['Pickup_Hour'].value_counts().idxmax()
 
     insights = [
-        f"📌 Delay on weekdays is <b>{(wk_delay - we_delay)*100:.1f}%</b> higher than weekends.",
-        f"⏰ Busiest pickup hour: <b>{busiest_hour}:00</b>",
-        f"📌 Service area with highest delay rate: <b>{top_service}</b> (<b>{service_delay[top_service]*100:.1f}%</b>)",
-        f"🏙 City with most delayed rides: <b>{top_city_delay}</b> (<b>{city_delay[top_city_delay]:,}</b> delays)",
-        f"⏰ Hour with highest delay rate: <b>{peak_hour}:00</b> (<b>{hourly_delay[peak_hour]*100:.1f}%</b>)",
-        f"🏙 Pickup city with most rides: <b>{top_city_rides}</b> (<b>{df_f['PickupCity'].value_counts()[top_city_rides]:,}</b> rides)",
-        f"📌 Total delayed rides: <b>{total_delays:,}</b> (<b>{total_delays/len(df_f)*100:.1f}%</b>)",
-        f"📌 Delayed rides are on average <b>{avg_dist_delay:.1f} mi</b> vs <b>{avg_dist_all:.1f} mi</b> overall."
-    ]
+    f"📌 Delays are <b>{abs(wk_delay - we_delay)*100:.1f}%</b> "
+    + ("more common" if we_delay > wk_delay else "less common")
+    + " on weekdays than weekends.",
+
+    f"⏰ Busiest pickup hour: <b>{busiest_hour}:00</b>",
+
+    f"📌 Service area with highest delay rate: <b>{top_service}</b> "
+    f"(<b>{service_delay[top_service]*100:.1f}%</b>)",
+
+    f"🏙 City with most delayed rides: <b>{top_city_delay}</b> "
+    f"(<b>{city_delay[top_city_delay]:,}</b> delays)",
+
+    f"⏰ Hour with highest delay rate: <b>{peak_hour}:00</b> "
+    f"(<b>{hourly_delay[peak_hour]*100:.1f}%</b>)",
+
+    f"🏙 Pickup city with most rides: <b>{top_city_rides}</b> "
+    f"(<b>{df_f['PickupCity'].value_counts()[top_city_rides]:,}</b> rides)",
+
+    f"📌 Total delayed rides: <b>{total_delays:,}</b> "
+    f"(<b>{total_delays/len(df_f)*100:.1f}%</b>)",
+
+    f"📌 Delayed trips average <b>{avg_dist_delay:.1f} mi</b> "
+    f"vs <b>{avg_dist_all:.1f} mi</b> for all trips — "
+    + ("slightly shorter." if avg_dist_delay < avg_dist_all else "slightly longer.")
+]
 
     cols = st.columns(2)
     for i, insight in enumerate(insights):
